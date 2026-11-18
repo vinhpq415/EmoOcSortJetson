@@ -1,0 +1,19 @@
+# Jetson Orin AGX (JetPack 6.x). Do NOT add torch / torchvision here: install NVIDIA's JetPack wheels first.
+# The tensorrt Python package comes with JetPack (use a venv created with --system-site-packages).
+# ultralytics is installed separately WITHOUT dependencies so pip cannot replace NVIDIA's torch:
+#   pip install ultralytics==8.4.194 --no-deps
+numpy
+scipy
+filterpy
+lap            # optional: OC-SORT falls back to scipy.optimize.linear_sum_assignment if it does not build
+PyYAML
+matplotlib
+pandas
+seaborn
+pillow
+psutil
+requests
+packaging
+ultralytics-thop
+onnx           # TensorRT export goes through ONNX
+# opencv: prefer JetPack's system OpenCV (GStreamer, hardware decode); otherwise: opencv-python

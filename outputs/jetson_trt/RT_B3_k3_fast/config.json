@@ -1,0 +1,49 @@
+{
+  "exp": "RT_B3_k3_fast",
+  "seq": "VNTraffic",
+  "streams": 4,
+  "offsets_s": [
+    0.0,
+    0.25,
+    0.5,
+    0.75
+  ],
+  "mode": "realtime",
+  "fps": 30.0,
+  "frames_per_stream": 510,
+  "policy": {
+    "name": "periodic_est",
+    "k": 3,
+    "sim_thresh": 0.75,
+    "afd": true,
+    "drops_count": false
+  },
+  "tracker": {
+    "det_thresh": 0.3,
+    "max_age": 30,
+    "min_hits": 3,
+    "iou_threshold": 0.3,
+    "delta_t": 3,
+    "asso_func": "iou",
+    "inertia": 0.2,
+    "use_byte": false,
+    "skip_mode": "V1",
+    "skip_oru": false
+  },
+  "fp16": true,
+  "async_gpu": true,
+  "closed_form_advance": true,
+  "cuda_graph": true,
+  "switch_interval_s": 0.0005,
+  "device": "Orin",
+  "decode_ms_per_frame_measured_separately": 5.6,
+  "paths": {
+    "code_root": "/home/orin/emo/EmoOcSortJetson",
+    "data_root": "/home/orin/emo/Vehicle_Tracking_MOT",
+    "weights": "/home/orin/emo/engines",
+    "yolov5_dir": "/home/orin/emo/yolov5",
+    "trackeval_dir": "/home/orin/emo/EmoOcSortJetson/third_party/TrackEval",
+    "output_root": "/home/orin/emo/EmoOcSortJetson/outputs"
+  },
+  "started": "2026-11-20 17:26:01"
+}

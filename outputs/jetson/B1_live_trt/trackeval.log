@@ -1,0 +1,34 @@
+
+CLEAR Config:
+THRESHOLD            : 0.5                           
+PRINT_CONFIG         : True                          
+
+Identity Config:
+THRESHOLD            : 0.5                           
+PRINT_CONFIG         : True                          
+
+Evaluating 1 tracker(s) on 2 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: HOTA, CLEAR, Identity, Count
+
+
+Evaluating B1_live_trt
+
+
+HOTA: B1_live_trt-pedestrian       HOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      OWTA      HOTA(0)   LocA(0)   HOTALocA(0)
+AICC22-Custom                      65.392    57.247    75.146    83.202    62.481    89.843    78.875    89.233    78.994    73.935    86.785    64.164    
+VNTraffic                          75.367    77.155    73.84     82.777    87.497    76.804    90.561    89.998    78.173    84.785    88.332    74.892    
+COMBINED                           74.513    75.336    73.93     82.806    85.135    77.708    89.751    89.944    78.233    83.854    88.223    73.978    
+
+CLEAR: B1_live_trt-pedestrian      MOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
+AICC22-Custom                      48.27     88.242    48.27     90.717    68.124    57.143    33.333    9.5238    37.603    1075      110       503       0         12        7         2         8         
+VNTraffic                          87.292    88.721    87.567    91.086    96.28     80        14.118    5.8824    77.019    14572     1426      563       44        68        12        5         241       
+COMBINED                           84.601    88.688    84.857    91.061    93.622    75.472    17.925    6.6038    74.301    15647     1536      1066      44        80        19        7         249       
+
+Identity: B1_live_trt-pedestrian   IDF1      IDR       IDP       IDTP      IDFN      IDFP      
+AICC22-Custom                      77.814    90.717    68.124    1075      110       503       
+VNTraffic                          84.656    82.373    87.07     13178     2820      1957      
+COMBINED                           84.098    82.948    85.281    14253     2930      2460      
+
+Count: B1_live_trt-pedestrian      Dets      GT_Dets   IDs       GT_IDs    
+AICC22-Custom                      1578      1185      31        21        
+VNTraffic                          15135     15998     123       85        
+COMBINED                           16713     17183     154       106       

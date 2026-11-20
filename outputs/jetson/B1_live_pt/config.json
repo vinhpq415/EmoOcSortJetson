@@ -1,0 +1,54 @@
+{
+  "exp": "B1_live_pt",
+  "seqs": [
+    "VNTraffic",
+    "AICC22-Custom"
+  ],
+  "detector": {
+    "input_hw": [
+      384,
+      640
+    ],
+    "fp16": true,
+    "conf_thres": 0.1,
+    "iou_thres": 0.45,
+    "classes": [
+      2,
+      3,
+      5,
+      7
+    ],
+    "agnostic_nms": true
+  },
+  "dets_cache_tag": "yolov5x_384x640_fp16_conf0.1_iou0.45_agn_c2-3-5-7",
+  "use_cache": false,
+  "tracker": {
+    "det_thresh": 0.3,
+    "max_age": 30,
+    "min_hits": 3,
+    "iou_threshold": 0.3,
+    "delta_t": 3,
+    "asso_func": "iou",
+    "inertia": 0.2,
+    "use_byte": false,
+    "skip_mode": "V1",
+    "skip_oru": true
+  },
+  "policy": {
+    "name": "none",
+    "k": 4,
+    "sim_thresh": 0.75,
+    "afd": true
+  },
+  "max_frames": null,
+  "paths": {
+    "code_root": "/home/orin/emo/EmoOcSortJetson",
+    "data_root": "/home/orin/emo/Vehicle_Tracking_MOT",
+    "weights": "/home/orin/emo/yolov5x.pt",
+    "yolov5_dir": "/home/orin/emo/yolov5",
+    "trackeval_dir": "/home/orin/emo/EmoOcSortJetson/third_party/TrackEval",
+    "output_root": "/home/orin/emo/EmoOcSortJetson/outputs"
+  },
+  "device": "Orin",
+  "started": "2026-11-20 17:23:46"
+}

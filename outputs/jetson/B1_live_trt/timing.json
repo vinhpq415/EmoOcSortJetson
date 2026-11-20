@@ -1,0 +1,42 @@
+{
+  "VNTraffic": {
+    "frames": 510,
+    "detector": "live",
+    "frames_detected": 510,
+    "frames_skipped": 0,
+    "skip_ratio": 0.0,
+    "decode_ms": 4.744,
+    "decision_ms": 0.0,
+    "est_ms_on_skipped": null,
+    "track_ms_on_detected": 7.463,
+    "mean_dets_per_detected_frame": 48.471,
+    "mean_tracks_per_frame": 30.245,
+    "det_total_ms_on_detected": 16.545,
+    "det_infer_ms_on_detected": 8.515,
+    "proc_ms_per_frame": 24.01,
+    "fps_proc": 41.6,
+    "fps_with_decode": 34.8,
+    "rows_kept": 15135,
+    "rows_removed_outside_gt_range": 290
+  },
+  "AICC22-Custom": {
+    "frames": 200,
+    "detector": "live",
+    "frames_detected": 200,
+    "frames_skipped": 0,
+    "skip_ratio": 0.0,
+    "decode_ms": 2.26,
+    "decision_ms": 0.0,
+    "est_ms_on_skipped": null,
+    "track_ms_on_detected": 3.458,
+    "mean_dets_per_detected_frame": 13.21,
+    "mean_tracks_per_frame": 7.985,
+    "det_total_ms_on_detected": 14.158,
+    "det_infer_ms_on_detected": 8.516,
+    "proc_ms_per_frame": 17.62,
+    "fps_proc": 56.8,
+    "fps_with_decode": 50.3,
+    "rows_kept": 1578,
+    "rows_removed_outside_gt_range": 19
+  }
+}

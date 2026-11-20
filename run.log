@@ -1,0 +1,582 @@
+== 0. power mode MAXN + fixed clocks (needs sudo), tegrastats log
+NV Power Mode: MAXN
+0
+== 1. environment check with the PyTorch weights (FP16 is automatic on Orin)
+/usr/lib/python3/dist-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.17.3 and <1.25.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+
+== 1. Environment
+  python          3.10.12
+  torch           2.8.0
+  cuda            12.6
+  cudnn           90300
+  numpy           1.26.4
+  opencv          4.8.0
+  scipy           1.8.0
+  ultralytics     8.4.194
+  filterpy        2.0.0
+  lap             0.5.14
+  gpu             Orin
+  gpu_capability  8.7
+  gpu_mem_gb      30.0
+  gpu_count       1
+  auto_fp16       True
+  code_root       /home/orin/emo/EmoOcSortJetson
+  data_root       /home/orin/emo/Vehicle_Tracking_MOT
+  weights         /home/orin/emo/yolov5x.pt
+  yolov5_dir      /home/orin/emo/yolov5
+  trackeval_dir   /home/orin/emo/EmoOcSortJetson/third_party/TrackEval
+  output_root     /home/orin/emo/EmoOcSortJetson/outputs
+  [PASS] cuda available
+  [PASS] package ultralytics
+  [PASS] package filterpy
+  [PASS] package lap
+  [PASS] path data_root exists - /home/orin/emo/Vehicle_Tracking_MOT
+  [PASS] path weights exists - /home/orin/emo/yolov5x.pt
+  [PASS] path yolov5_dir exists - /home/orin/emo/yolov5
+  [PASS] path trackeval_dir exists - /home/orin/emo/EmoOcSortJetson/third_party/TrackEval
+  [PASS] sequences.json exists
+  [PASS] yolov5 pinned commit - HEAD=af08ba156fd58ed5b0fe7e4e58a22c72c3cdd0ce
+  [PASS] TrackEval pinned commit - HEAD=12c8791b303e0a0b50f753af204249e622d0281a
+Fusing layers... 
+YOLOv5x summary: 256 layers, 86,705,005 parameters, 0 gradients, 205.4 GFLOPs
+
+== 2. Detector
+  [PASS] 80 COCO classes - 80 classes
+  [PASS] vehicle class names
+  [PASS] VNTraffic frame 1 detections - 49 dets (conf>=0.1), 30 with conf>=0.4, {'car': 17, 'motorcycle': 29, 'bus': 1, 'truck': 2}
+  saved /home/orin/emo/EmoOcSortJetson/outputs/env_check/det_frame1.jpg
+
+== 4. OC-SORT on the first 60 VNTraffic frames
+  [PASS] OC-SORT produces tracks - mean 25.3 tracks/frame, 44 unique IDs
+  [PASS] IDs persist - 60% of IDs at frame 10 still present at frame 60
+
+== 3. Speed (median over iterations; end2end = letterbox + forward + NMS + rescale)
+Fusing layers... 
+YOLOv5x summary: 256 layers, 86,705,005 parameters, 0 gradients, 205.4 GFLOPs
+  fp16 batch 1: forward 27.1 ms, end2end 34.6 ms -> 28.9 img/s
+  fp16 batch 4: forward 63.3 ms, end2end 90.2 ms -> 44.3 img/s
+Fusing layers... 
+YOLOv5x summary: 256 layers, 86,705,005 parameters, 0 gradients, 205.4 GFLOPs
+/home/orin/emo/EmoOcSortJetson/tools/run_trackeval.py:17: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+  fp32 batch 1: forward 30.4 ms, end2end 37.7 ms -> 26.5 img/s
+  fp32 batch 4: forward 94.4 ms, end2end 121.2 ms -> 33.0 img/s
+
+== 5. TrackEval self-check
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+  [PASS] TrackEval GT vs GT = 100
+
+report: /home/orin/emo/EmoOcSortJetson/outputs/env_check/report.json
+ENV CHECK PASSED
+== 2. TensorRT FP16 engines, batch 1..4 (built on THIS device; ~minutes each)
+[export] batch 1: /home/orin/emo/tracking/bin/python3 /home/orin/emo/yolov5/export.py --weights /home/orin/emo/engines/_work/yolov5x.pt --include engine --half --device 0 --imgsz 384 640 --batch-size 1 --workspace 4
+[34m[1mexport: [0mdata=data/coco128.yaml, weights=['/home/orin/emo/engines/_work/yolov5x.pt'], imgsz=[384, 640], batch_size=1, device=0, half=True, inplace=False, keras=False, optimize=False, int8=False, per_tensor=False, dynamic=False, cache=, simplify=False, mlmodel=False, opset=17, verbose=False, workspace=4, nms=False, agnostic_nms=False, topk_per_class=100, topk_all=100, iou_thres=0.45, conf_thres=0.25, include=['engine']
+YOLOv5 🚀 v7.0-561-gaf08ba15 Python-3.10.12 torch-2.8.0 CUDA:0 (Orin, 30697MiB)
+
+Fusing layers... 
+YOLOv5x summary: 256 layers, 86,705,005 parameters, 0 gradients, 205.4 GFLOPs
+
+[34m[1mPyTorch:[0m starting from /home/orin/emo/engines/_work/yolov5x.pt with output shape (1, 15120, 85) (166.0 MB)
+
+[34m[1mONNX:[0m starting export with onnx 1.23.2...
+[34m[1mONNX:[0m export success ✅ 3.4s, saved as /home/orin/emo/engines/_work/yolov5x.onnx (165.6 MB)
+
+[34m[1mTensorRT:[0m starting export with TensorRT 10.3.0...
+[11/20/2026-16:39:27] [TRT] [I] [MemUsageChange] Init CUDA: CPU +1, GPU +0, now: CPU 857, GPU 3914 (MiB)
+[11/20/2026-16:39:28] [TRT] [I] [MemUsageChange] Init builder kernel library: CPU +928, GPU +754, now: CPU 1828, GPU 4694 (MiB)
+[11/20/2026-16:39:29] [TRT] [I] ----------------------------------------------------------------
+[11/20/2026-16:39:29] [TRT] [I] Input filename:   /home/orin/emo/engines/_work/yolov5x.onnx
+[11/20/2026-16:39:29] [TRT] [I] ONNX IR version:  0.0.7
+[11/20/2026-16:39:29] [TRT] [I] Opset version:    12
+[11/20/2026-16:39:29] [TRT] [I] Producer name:    pytorch
+[11/20/2026-16:39:29] [TRT] [I] Producer version: 2.8.0
+[11/20/2026-16:39:29] [TRT] [I] Domain:           
+[11/20/2026-16:39:29] [TRT] [I] Model version:    0
+[11/20/2026-16:39:29] [TRT] [I] Doc string:       
+[11/20/2026-16:39:29] [TRT] [I] ----------------------------------------------------------------
+[34m[1mTensorRT:[0m input "images" with shape(1, 3, 384, 640) DataType.HALF
+[34m[1mTensorRT:[0m output "output0" with shape(1, 15120, 85) DataType.HALF
+[34m[1mTensorRT:[0m building FP16 engine as /home/orin/emo/engines/_work/yolov5x.engine
+[11/20/2026-16:39:29] [TRT] [I] Local timing cache in use. Profiling results in this builder pass will not be stored.
+[11/20/2026-16:47:39] [TRT] [I] Detected 1 inputs and 4 output network tensors.
+[11/20/2026-16:47:48] [TRT] [I] Total Host Persistent Memory: 736864
+[11/20/2026-16:47:48] [TRT] [I] Total Device Persistent Memory: 18432
+[11/20/2026-16:47:48] [TRT] [I] Total Scratch Memory: 512
+[11/20/2026-16:47:48] [TRT] [I] [BlockAssignment] Started assigning block shifts. This will take 163 steps to complete.
+[11/20/2026-16:47:48] [TRT] [I] [BlockAssignment] Algorithm ShiftNTopDown took 8.37397ms to assign 7 blocks to 163 nodes requiring 25805312 bytes.
+[11/20/2026-16:47:48] [TRT] [I] Total Activation Memory: 25804800
+[11/20/2026-16:47:48] [TRT] [I] Total Weights Memory: 173585920
+[11/20/2026-16:47:48] [TRT] [I] Engine generation completed in 499.635 seconds.
+[11/20/2026-16:47:48] [TRT] [I] [MemUsageStats] Peak memory usage of TRT CPU/GPU memory allocators: CPU 14 MiB, GPU 384 MiB
+[11/20/2026-16:47:48] [TRT] [I] [MemUsageStats] Peak memory usage during Engine building and serialization: CPU: 4301 MiB
+[34m[1mTensorRT:[0m export success ✅ 505.8s, saved as /home/orin/emo/engines/_work/yolov5x.engine (168.1 MB)
+
+Export complete (507.5s)
+Results saved to [1m/home/orin/emo/engines/_work[0m
+Detect:          python detect.py --weights /home/orin/emo/engines/_work/yolov5x.engine --half
+Validate:        python val.py --weights /home/orin/emo/engines/_work/yolov5x.engine --half
+PyTorch Hub:     model = torch.hub.load('ultralytics/yolov5', 'custom', '/home/orin/emo/engines/_work/yolov5x.engine')  
+Visualize:       https://netron.app
+[export] -> /home/orin/emo/engines/yolov5x_b1.engine (168 MB, 513 s)
+[export] batch 2: /home/orin/emo/tracking/bin/python3 /home/orin/emo/yolov5/export.py --weights /home/orin/emo/engines/_work/yolov5x.pt --include engine --half --device 0 --imgsz 384 640 --batch-size 2 --workspace 4
+[34m[1mexport: [0mdata=data/coco128.yaml, weights=['/home/orin/emo/engines/_work/yolov5x.pt'], imgsz=[384, 640], batch_size=2, device=0, half=True, inplace=False, keras=False, optimize=False, int8=False, per_tensor=False, dynamic=False, cache=, simplify=False, mlmodel=False, opset=17, verbose=False, workspace=4, nms=False, agnostic_nms=False, topk_per_class=100, topk_all=100, iou_thres=0.45, conf_thres=0.25, include=['engine']
+YOLOv5 🚀 v7.0-561-gaf08ba15 Python-3.10.12 torch-2.8.0 CUDA:0 (Orin, 30697MiB)
+
+Fusing layers... 
+YOLOv5x summary: 256 layers, 86,705,005 parameters, 0 gradients, 205.4 GFLOPs
+
+[34m[1mPyTorch:[0m starting from /home/orin/emo/engines/_work/yolov5x.pt with output shape (2, 15120, 85) (166.0 MB)
+
+[34m[1mONNX:[0m starting export with onnx 1.23.2...
+[34m[1mONNX:[0m export success ✅ 10.3s, saved as /home/orin/emo/engines/_work/yolov5x.onnx (165.6 MB)
+
+[34m[1mTensorRT:[0m starting export with TensorRT 10.3.0...
+[11/20/2026-16:48:07] [TRT] [I] [MemUsageChange] Init CUDA: CPU +1, GPU +0, now: CPU 862, GPU 7425 (MiB)
+[11/20/2026-16:48:08] [TRT] [I] [MemUsageChange] Init builder kernel library: CPU +928, GPU +984, now: CPU 1833, GPU 8410 (MiB)
+[11/20/2026-16:48:08] [TRT] [I] ----------------------------------------------------------------
+[11/20/2026-16:48:08] [TRT] [I] Input filename:   /home/orin/emo/engines/_work/yolov5x.onnx
+[11/20/2026-16:48:08] [TRT] [I] ONNX IR version:  0.0.7
+[11/20/2026-16:48:08] [TRT] [I] Opset version:    12
+[11/20/2026-16:48:08] [TRT] [I] Producer name:    pytorch
+[11/20/2026-16:48:08] [TRT] [I] Producer version: 2.8.0
+[11/20/2026-16:48:08] [TRT] [I] Domain:           
+[11/20/2026-16:48:08] [TRT] [I] Model version:    0
+[11/20/2026-16:48:08] [TRT] [I] Doc string:       
+[11/20/2026-16:48:08] [TRT] [I] ----------------------------------------------------------------
+[34m[1mTensorRT:[0m input "images" with shape(2, 3, 384, 640) DataType.HALF
+[34m[1mTensorRT:[0m output "output0" with shape(2, 15120, 85) DataType.HALF
+[34m[1mTensorRT:[0m building FP16 engine as /home/orin/emo/engines/_work/yolov5x.engine
+[11/20/2026-16:48:08] [TRT] [I] Local timing cache in use. Profiling results in this builder pass will not be stored.
+[11/20/2026-16:58:05] [TRT] [I] Detected 1 inputs and 4 output network tensors.
+[11/20/2026-16:58:14] [TRT] [I] Total Host Persistent Memory: 750624
+[11/20/2026-16:58:14] [TRT] [I] Total Device Persistent Memory: 24576
+[11/20/2026-16:58:14] [TRT] [I] Total Scratch Memory: 0
+[11/20/2026-16:58:14] [TRT] [I] [BlockAssignment] Started assigning block shifts. This will take 160 steps to complete.
+[11/20/2026-16:58:14] [TRT] [I] [BlockAssignment] Algorithm ShiftNTopDown took 7.05158ms to assign 8 blocks to 160 nodes requiring 51610624 bytes.
+[11/20/2026-16:58:14] [TRT] [I] Total Activation Memory: 51609600
+[11/20/2026-16:58:14] [TRT] [I] Total Weights Memory: 173585920
+[11/20/2026-16:58:14] [TRT] [I] Engine generation completed in 605.88 seconds.
+[11/20/2026-16:58:14] [TRT] [I] [MemUsageStats] Peak memory usage of TRT CPU/GPU memory allocators: CPU 14 MiB, GPU 384 MiB
+[11/20/2026-16:58:14] [TRT] [I] [MemUsageStats] Peak memory usage during Engine building and serialization: CPU: 4441 MiB
+[34m[1mTensorRT:[0m export success ✅ 618.6s, saved as /home/orin/emo/engines/_work/yolov5x.engine (167.8 MB)
+
+Export complete (620.5s)
+Results saved to [1m/home/orin/emo/engines/_work[0m
+Detect:          python detect.py --weights /home/orin/emo/engines/_work/yolov5x.engine --half
+Validate:        python val.py --weights /home/orin/emo/engines/_work/yolov5x.engine --half
+PyTorch Hub:     model = torch.hub.load('ultralytics/yolov5', 'custom', '/home/orin/emo/engines/_work/yolov5x.engine')  
+Visualize:       https://netron.app
+[export] -> /home/orin/emo/engines/yolov5x_b2.engine (168 MB, 626 s)
+[export] batch 3: /home/orin/emo/tracking/bin/python3 /home/orin/emo/yolov5/export.py --weights /home/orin/emo/engines/_work/yolov5x.pt --include engine --half --device 0 --imgsz 384 640 --batch-size 3 --workspace 4
+[34m[1mexport: [0mdata=data/coco128.yaml, weights=['/home/orin/emo/engines/_work/yolov5x.pt'], imgsz=[384, 640], batch_size=3, device=0, half=True, inplace=False, keras=False, optimize=False, int8=False, per_tensor=False, dynamic=False, cache=, simplify=False, mlmodel=False, opset=17, verbose=False, workspace=4, nms=False, agnostic_nms=False, topk_per_class=100, topk_all=100, iou_thres=0.45, conf_thres=0.25, include=['engine']
+YOLOv5 🚀 v7.0-561-gaf08ba15 Python-3.10.12 torch-2.8.0 CUDA:0 (Orin, 30697MiB)
+
+Fusing layers... 
+YOLOv5x summary: 256 layers, 86,705,005 parameters, 0 gradients, 205.4 GFLOPs
+
+[34m[1mPyTorch:[0m starting from /home/orin/emo/engines/_work/yolov5x.pt with output shape (3, 15120, 85) (166.0 MB)
+
+[34m[1mONNX:[0m starting export with onnx 1.23.2...
+[34m[1mONNX:[0m export success ✅ 16.6s, saved as /home/orin/emo/engines/_work/yolov5x.onnx (165.6 MB)
+
+[34m[1mTensorRT:[0m starting export with TensorRT 10.3.0...
+[11/20/2026-16:58:39] [TRT] [I] [MemUsageChange] Init CUDA: CPU +2, GPU +0, now: CPU 857, GPU 7292 (MiB)
+[11/20/2026-16:58:41] [TRT] [I] [MemUsageChange] Init builder kernel library: CPU +927, GPU +1096, now: CPU 1827, GPU 8413 (MiB)
+[11/20/2026-16:58:41] [TRT] [I] ----------------------------------------------------------------
+[11/20/2026-16:58:41] [TRT] [I] Input filename:   /home/orin/emo/engines/_work/yolov5x.onnx
+[11/20/2026-16:58:41] [TRT] [I] ONNX IR version:  0.0.7
+[11/20/2026-16:58:41] [TRT] [I] Opset version:    12
+[11/20/2026-16:58:41] [TRT] [I] Producer name:    pytorch
+[11/20/2026-16:58:41] [TRT] [I] Producer version: 2.8.0
+[11/20/2026-16:58:41] [TRT] [I] Domain:           
+[11/20/2026-16:58:41] [TRT] [I] Model version:    0
+[11/20/2026-16:58:41] [TRT] [I] Doc string:       
+[11/20/2026-16:58:41] [TRT] [I] ----------------------------------------------------------------
+[34m[1mTensorRT:[0m input "images" with shape(3, 3, 384, 640) DataType.HALF
+[34m[1mTensorRT:[0m output "output0" with shape(3, 15120, 85) DataType.HALF
+[34m[1mTensorRT:[0m building FP16 engine as /home/orin/emo/engines/_work/yolov5x.engine
+[11/20/2026-16:58:41] [TRT] [I] Local timing cache in use. Profiling results in this builder pass will not be stored.
+[11/20/2026-17:09:51] [TRT] [I] Detected 1 inputs and 4 output network tensors.
+[11/20/2026-17:10:00] [TRT] [I] Total Host Persistent Memory: 753760
+[11/20/2026-17:10:00] [TRT] [I] Total Device Persistent Memory: 15360
+[11/20/2026-17:10:00] [TRT] [I] Total Scratch Memory: 0
+[11/20/2026-17:10:00] [TRT] [I] [BlockAssignment] Started assigning block shifts. This will take 168 steps to complete.
+[11/20/2026-17:10:00] [TRT] [I] [BlockAssignment] Algorithm ShiftNTopDown took 8.27327ms to assign 7 blocks to 168 nodes requiring 77414912 bytes.
+[11/20/2026-17:10:00] [TRT] [I] Total Activation Memory: 77414400
+[11/20/2026-17:10:00] [TRT] [I] Total Weights Memory: 173585920
+[11/20/2026-17:10:00] [TRT] [I] Engine generation completed in 679.575 seconds.
+[11/20/2026-17:10:00] [TRT] [I] [MemUsageStats] Peak memory usage of TRT CPU/GPU memory allocators: CPU 14 MiB, GPU 384 MiB
+[11/20/2026-17:10:00] [TRT] [I] [MemUsageStats] Peak memory usage during Engine building and serialization: CPU: 4510 MiB
+[34m[1mTensorRT:[0m export success ✅ 698.8s, saved as /home/orin/emo/engines/_work/yolov5x.engine (168.1 MB)
+
+Export complete (700.6s)
+Results saved to [1m/home/orin/emo/engines/_work[0m
+Detect:          python detect.py --weights /home/orin/emo/engines/_work/yolov5x.engine --half
+Validate:        python val.py --weights /home/orin/emo/engines/_work/yolov5x.engine --half
+PyTorch Hub:     model = torch.hub.load('ultralytics/yolov5', 'custom', '/home/orin/emo/engines/_work/yolov5x.engine')  
+Visualize:       https://netron.app
+[export] -> /home/orin/emo/engines/yolov5x_b3.engine (168 MB, 706 s)
+[export] batch 4: /home/orin/emo/tracking/bin/python3 /home/orin/emo/yolov5/export.py --weights /home/orin/emo/engines/_work/yolov5x.pt --include engine --half --device 0 --imgsz 384 640 --batch-size 4 --workspace 4
+[34m[1mexport: [0mdata=data/coco128.yaml, weights=['/home/orin/emo/engines/_work/yolov5x.pt'], imgsz=[384, 640], batch_size=4, device=0, half=True, inplace=False, keras=False, optimize=False, int8=False, per_tensor=False, dynamic=False, cache=, simplify=False, mlmodel=False, opset=17, verbose=False, workspace=4, nms=False, agnostic_nms=False, topk_per_class=100, topk_all=100, iou_thres=0.45, conf_thres=0.25, include=['engine']
+YOLOv5 🚀 v7.0-561-gaf08ba15 Python-3.10.12 torch-2.8.0 CUDA:0 (Orin, 30697MiB)
+
+Fusing layers... 
+YOLOv5x summary: 256 layers, 86,705,005 parameters, 0 gradients, 205.4 GFLOPs
+
+[34m[1mPyTorch:[0m starting from /home/orin/emo/engines/_work/yolov5x.pt with output shape (4, 15120, 85) (166.0 MB)
+
+[34m[1mONNX:[0m starting export with onnx 1.23.2...
+[34m[1mONNX:[0m export success ✅ 17.0s, saved as /home/orin/emo/engines/_work/yolov5x.onnx (165.6 MB)
+
+[34m[1mTensorRT:[0m starting export with TensorRT 10.3.0...
+[11/20/2026-17:10:25] [TRT] [I] [MemUsageChange] Init CUDA: CPU +2, GPU +0, now: CPU 862, GPU 7505 (MiB)
+[11/20/2026-17:10:27] [TRT] [I] [MemUsageChange] Init builder kernel library: CPU +927, GPU +1033, now: CPU 1832, GPU 8538 (MiB)
+[11/20/2026-17:10:27] [TRT] [I] ----------------------------------------------------------------
+[11/20/2026-17:10:27] [TRT] [I] Input filename:   /home/orin/emo/engines/_work/yolov5x.onnx
+[11/20/2026-17:10:27] [TRT] [I] ONNX IR version:  0.0.7
+[11/20/2026-17:10:27] [TRT] [I] Opset version:    12
+[11/20/2026-17:10:27] [TRT] [I] Producer name:    pytorch
+[11/20/2026-17:10:27] [TRT] [I] Producer version: 2.8.0
+[11/20/2026-17:10:27] [TRT] [I] Domain:           
+[11/20/2026-17:10:27] [TRT] [I] Model version:    0
+[11/20/2026-17:10:27] [TRT] [I] Doc string:       
+[11/20/2026-17:10:27] [TRT] [I] ----------------------------------------------------------------
+[34m[1mTensorRT:[0m input "images" with shape(4, 3, 384, 640) DataType.HALF
+[34m[1mTensorRT:[0m output "output0" with shape(4, 15120, 85) DataType.HALF
+[34m[1mTensorRT:[0m building FP16 engine as /home/orin/emo/engines/_work/yolov5x.engine
+[11/20/2026-17:10:27] [TRT] [I] Local timing cache in use. Profiling results in this builder pass will not be stored.
+[11/20/2026-17:22:54] [TRT] [I] Detected 1 inputs and 4 output network tensors.
+[11/20/2026-17:23:02] [TRT] [I] Total Host Persistent Memory: 756896
+[11/20/2026-17:23:02] [TRT] [I] Total Device Persistent Memory: 14336
+[11/20/2026-17:23:02] [TRT] [I] Total Scratch Memory: 0
+[11/20/2026-17:23:02] [TRT] [I] [BlockAssignment] Started assigning block shifts. This will take 162 steps to complete.
+[11/20/2026-17:23:02] [TRT] [I] [BlockAssignment] Algorithm ShiftNTopDown took 7.45559ms to assign 6 blocks to 162 nodes requiring 103219200 bytes.
+[11/20/2026-17:23:02] [TRT] [I] Total Activation Memory: 103219200
+[11/20/2026-17:23:02] [TRT] [I] Total Weights Memory: 173585920
+[11/20/2026-17:23:03] [TRT] [I] Engine generation completed in 755.391 seconds.
+[11/20/2026-17:23:03] [TRT] [I] [MemUsageStats] Peak memory usage of TRT CPU/GPU memory allocators: CPU 14 MiB, GPU 384 MiB
+[11/20/2026-17:23:03] [TRT] [I] [MemUsageStats] Peak memory usage during Engine building and serialization: CPU: 4611 MiB
+[34m[1mTensorRT:[0m export success ✅ 775.0s, saved as /home/orin/emo/engines/_work/yolov5x.engine (167.6 MB)
+
+Export complete (776.9s)
+Results saved to [1m/home/orin/emo/engines/_work[0m
+Detect:          python detect.py --weights /home/orin/emo/engines/_work/yolov5x.engine --half
+Validate:        python val.py --weights /home/orin/emo/engines/_work/yolov5x.engine --half
+PyTorch Hub:     model = torch.hub.load('ultralytics/yolov5', 'custom', '/home/orin/emo/engines/_work/yolov5x.engine')  
+Visualize:       https://netron.app
+[export] -> /home/orin/emo/engines/yolov5x_b4.engine (168 MB, 782 s)
+done. Use: EMO_WEIGHTS=/home/orin/emo/engines
+== 3. environment check with TensorRT
+/usr/lib/python3/dist-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.17.3 and <1.25.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+
+== 1. Environment
+  python          3.10.12
+  torch           2.8.0
+  cuda            12.6
+  cudnn           90300
+  numpy           1.26.4
+  opencv          4.8.0
+  scipy           1.8.0
+  ultralytics     8.4.194
+  filterpy        2.0.0
+  lap             0.5.14
+  gpu             Orin
+  gpu_capability  8.7
+  gpu_mem_gb      30.0
+  gpu_count       1
+  auto_fp16       True
+  code_root       /home/orin/emo/EmoOcSortJetson
+  data_root       /home/orin/emo/Vehicle_Tracking_MOT
+  weights         /home/orin/emo/engines
+  yolov5_dir      /home/orin/emo/yolov5
+  trackeval_dir   /home/orin/emo/EmoOcSortJetson/third_party/TrackEval
+  output_root     /home/orin/emo/EmoOcSortJetson/outputs
+  [PASS] cuda available
+  [PASS] package ultralytics
+  [PASS] package filterpy
+  [PASS] package lap
+  [PASS] path data_root exists - /home/orin/emo/Vehicle_Tracking_MOT
+  [PASS] path weights exists - /home/orin/emo/engines
+  [PASS] path yolov5_dir exists - /home/orin/emo/yolov5
+  [PASS] path trackeval_dir exists - /home/orin/emo/EmoOcSortJetson/third_party/TrackEval
+  [PASS] sequences.json exists
+  [PASS] yolov5 pinned commit - HEAD=af08ba156fd58ed5b0fe7e4e58a22c72c3cdd0ce
+  [PASS] TrackEval pinned commit - HEAD=12c8791b303e0a0b50f753af204249e622d0281a
+Loading /home/orin/emo/engines/yolov5x_b1.engine for TensorRT inference...
+[11/20/2026-17:23:10] [TRT] [I] Loaded engine size: 168 MiB
+[11/20/2026-17:23:10] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +25, now: CPU 1, GPU 190 (MiB)
+Loading /home/orin/emo/engines/yolov5x_b2.engine for TensorRT inference...
+[11/20/2026-17:23:10] [TRT] [I] The logger passed into createInferRuntime differs from one already provided for an existing builder, runtime, or refitter. Uses of the global logger, returned by nvinfer1::getLogger(), will return the existing value.
+[11/20/2026-17:23:10] [TRT] [I] Loaded engine size: 167 MiB
+[11/20/2026-17:23:10] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +50, now: CPU 2, GPU 405 (MiB)
+Loading /home/orin/emo/engines/yolov5x_b3.engine for TensorRT inference...
+[11/20/2026-17:23:10] [TRT] [I] The logger passed into createInferRuntime differs from one already provided for an existing builder, runtime, or refitter. Uses of the global logger, returned by nvinfer1::getLogger(), will return the existing value.
+[11/20/2026-17:23:10] [TRT] [I] Loaded engine size: 168 MiB
+[11/20/2026-17:23:11] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +74, now: CPU 3, GPU 644 (MiB)
+Loading /home/orin/emo/engines/yolov5x_b4.engine for TensorRT inference...
+[11/20/2026-17:23:11] [TRT] [I] The logger passed into createInferRuntime differs from one already provided for an existing builder, runtime, or refitter. Uses of the global logger, returned by nvinfer1::getLogger(), will return the existing value.
+[11/20/2026-17:23:11] [TRT] [I] Loaded engine size: 167 MiB
+[11/20/2026-17:23:11] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +99, now: CPU 4, GPU 908 (MiB)
+
+== 2. Detector
+  [PASS] 80 COCO classes - 80 classes
+  [PASS] vehicle class names
+  [PASS] VNTraffic frame 1 detections - 48 dets (conf>=0.1), 30 with conf>=0.4, {'car': 17, 'motorcycle': 28, 'bus': 1, 'truck': 2}
+  saved /home/orin/emo/EmoOcSortJetson/outputs/env_check/det_frame1.jpg
+
+== 4. OC-SORT on the first 60 VNTraffic frames
+  [PASS] OC-SORT produces tracks - mean 25.3 tracks/frame, 44 unique IDs
+  [PASS] IDs persist - 60% of IDs at frame 10 still present at frame 60
+
+== 3. Speed (median over iterations; end2end = letterbox + forward + NMS + rescale)
+Loading /home/orin/emo/engines/yolov5x_b1.engine for TensorRT inference...
+[11/20/2026-17:23:12] [TRT] [I] The logger passed into createInferRuntime differs from one already provided for an existing builder, runtime, or refitter. Uses of the global logger, returned by nvinfer1::getLogger(), will return the existing value.
+[11/20/2026-17:23:12] [TRT] [I] Loaded engine size: 168 MiB
+[11/20/2026-17:23:12] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +25, now: CPU 5, GPU 1098 (MiB)
+Loading /home/orin/emo/engines/yolov5x_b2.engine for TensorRT inference...
+[11/20/2026-17:23:12] [TRT] [I] The logger passed into createInferRuntime differs from one already provided for an existing builder, runtime, or refitter. Uses of the global logger, returned by nvinfer1::getLogger(), will return the existing value.
+[11/20/2026-17:23:12] [TRT] [I] Loaded engine size: 167 MiB
+[11/20/2026-17:23:13] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +49, now: CPU 6, GPU 1313 (MiB)
+Loading /home/orin/emo/engines/yolov5x_b3.engine for TensorRT inference...
+[11/20/2026-17:23:13] [TRT] [I] The logger passed into createInferRuntime differs from one already provided for an existing builder, runtime, or refitter. Uses of the global logger, returned by nvinfer1::getLogger(), will return the existing value.
+[11/20/2026-17:23:13] [TRT] [I] Loaded engine size: 168 MiB
+[11/20/2026-17:23:13] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +74, now: CPU 7, GPU 1552 (MiB)
+Loading /home/orin/emo/engines/yolov5x_b4.engine for TensorRT inference...
+[11/20/2026-17:23:13] [TRT] [I] The logger passed into createInferRuntime differs from one already provided for an existing builder, runtime, or refitter. Uses of the global logger, returned by nvinfer1::getLogger(), will return the existing value.
+[11/20/2026-17:23:13] [TRT] [I] Loaded engine size: 167 MiB
+[11/20/2026-17:23:13] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +98, now: CPU 8, GPU 1816 (MiB)
+/home/orin/emo/EmoOcSortJetson/tools/run_trackeval.py:17: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+  fp16 batch 1: forward 8.4 ms, end2end 15.9 ms -> 62.7 img/s
+  fp16 batch 4: forward 25.8 ms, end2end 52.9 ms -> 75.7 img/s
+
+== 5. TrackEval self-check
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+  [PASS] TrackEval GT vs GT = 100
+
+report: /home/orin/emo/EmoOcSortJetson/outputs/env_check/report.json
+ENV CHECK PASSED
+== 4. single stream, live detector, both videos (accuracy + per-stage timing)
+/usr/lib/python3/dist-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.17.3 and <1.25.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+[B1_live_trt] detector=live (yolov5x_384x640_fp16_conf0.1_iou0.45_agn_c2-3-5-7)
+[B1_live_trt] tracker={'det_thresh': 0.3, 'max_age': 30, 'min_hits': 3, 'iou_threshold': 0.3, 'delta_t': 3, 'asso_func': 'iou', 'inertia': 0.2, 'use_byte': False, 'skip_mode': 'V1', 'skip_oru': True}
+[B1_live_trt] policy={'name': 'none', 'k': 4, 'sim_thresh': 0.75, 'afd': True}
+Loading /home/orin/emo/engines/yolov5x_b1.engine for TensorRT inference...
+[11/20/2026-17:23:22] [TRT] [I] Loaded engine size: 168 MiB
+[11/20/2026-17:23:22] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +25, now: CPU 1, GPU 190 (MiB)
+Loading /home/orin/emo/engines/yolov5x_b2.engine for TensorRT inference...
+[11/20/2026-17:23:22] [TRT] [I] The logger passed into createInferRuntime differs from one already provided for an existing builder, runtime, or refitter. Uses of the global logger, returned by nvinfer1::getLogger(), will return the existing value.
+[11/20/2026-17:23:22] [TRT] [I] Loaded engine size: 167 MiB
+[11/20/2026-17:23:22] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +50, now: CPU 2, GPU 405 (MiB)
+Loading /home/orin/emo/engines/yolov5x_b3.engine for TensorRT inference...
+[11/20/2026-17:23:22] [TRT] [I] The logger passed into createInferRuntime differs from one already provided for an existing builder, runtime, or refitter. Uses of the global logger, returned by nvinfer1::getLogger(), will return the existing value.
+[11/20/2026-17:23:22] [TRT] [I] Loaded engine size: 168 MiB
+[11/20/2026-17:23:22] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +74, now: CPU 3, GPU 644 (MiB)
+Loading /home/orin/emo/engines/yolov5x_b4.engine for TensorRT inference...
+[11/20/2026-17:23:22] [TRT] [I] The logger passed into createInferRuntime differs from one already provided for an existing builder, runtime, or refitter. Uses of the global logger, returned by nvinfer1::getLogger(), will return the existing value.
+[11/20/2026-17:23:22] [TRT] [I] Loaded engine size: 167 MiB
+[11/20/2026-17:23:22] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +1, GPU +99, now: CPU 4, GPU 908 (MiB)
+/home/orin/emo/EmoOcSortJetson/tools/run_trackeval.py:17: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+[B1_live_trt] VNTraffic: detection cache -> /home/orin/emo/EmoOcSortJetson/outputs/dets_cache/yolov5x_384x640_fp16_conf0.1_iou0.45_agn_c2-3-5-7/VNTraffic.npz
+[B1_live_trt] VNTraffic: {"frames": 510, "detector": "live", "frames_detected": 510, "frames_skipped": 0, "skip_ratio": 0.0, "decode_ms": 4.744, "decision_ms": 0.0, "est_ms_on_skipped": null, "track_ms_on_detected": 7.463, "mean_dets_per_detected_frame": 48.471, "mean_tracks_per_frame": 30.245, "det_total_ms_on_detected": 16.545, "det_infer_ms_on_detected": 8.515, "proc_ms_per_frame": 24.01, "fps_proc": 41.6, "fps_with_decode": 34.8, "rows_kept": 15135, "rows_removed_outside_gt_range": 290}
+[B1_live_trt] AICC22-Custom: detection cache -> /home/orin/emo/EmoOcSortJetson/outputs/dets_cache/yolov5x_384x640_fp16_conf0.1_iou0.45_agn_c2-3-5-7/AICC22-Custom.npz
+[B1_live_trt] AICC22-Custom: {"frames": 200, "detector": "live", "frames_detected": 200, "frames_skipped": 0, "skip_ratio": 0.0, "decode_ms": 2.26, "decision_ms": 0.0, "est_ms_on_skipped": null, "track_ms_on_detected": 3.458, "mean_dets_per_detected_frame": 13.21, "mean_tracks_per_frame": 7.985, "det_total_ms_on_detected": 14.158, "det_infer_ms_on_detected": 8.516, "proc_ms_per_frame": 17.62, "fps_proc": 56.8, "fps_with_decode": 50.3, "rows_kept": 1578, "rows_removed_outside_gt_range": 19}
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+
+[B1_live_trt] seq            |   HOTA |   DetA |   AssA |   LocA |   MOTA |   MOTP |   IDF1 |   IDSW |     FP |     FN
+[B1_live_trt] AICC22-Custom  |  65.39 |  57.25 |  75.15 |  89.23 |  48.27 |  88.24 |  77.81 |      0 |    503 |    110
+[B1_live_trt] VNTraffic      |  75.37 |  77.15 |  73.84 |  90.00 |  87.29 |  88.72 |  84.66 |     44 |    563 |   1426
+[B1_live_trt] COMBINED_SEQ   |  74.51 |  75.34 |  73.93 |  89.94 |  84.60 |  88.69 |  84.10 |     44 |   1066 |   1536
+[B1_live_trt] results in /home/orin/emo/EmoOcSortJetson/outputs/jetson/B1_live_trt
+/usr/lib/python3/dist-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.17.3 and <1.25.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+[B1_live_pt] detector=live (yolov5x_384x640_fp16_conf0.1_iou0.45_agn_c2-3-5-7)
+[B1_live_pt] tracker={'det_thresh': 0.3, 'max_age': 30, 'min_hits': 3, 'iou_threshold': 0.3, 'delta_t': 3, 'asso_func': 'iou', 'inertia': 0.2, 'use_byte': False, 'skip_mode': 'V1', 'skip_oru': True}
+[B1_live_pt] policy={'name': 'none', 'k': 4, 'sim_thresh': 0.75, 'afd': True}
+Fusing layers... 
+YOLOv5x summary: 256 layers, 86,705,005 parameters, 0 gradients, 205.4 GFLOPs
+/home/orin/emo/EmoOcSortJetson/tools/run_trackeval.py:17: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, _name):
+[B1_live_pt] VNTraffic: detection cache -> /home/orin/emo/EmoOcSortJetson/outputs/dets_cache/yolov5x_384x640_fp16_conf0.1_iou0.45_agn_c2-3-5-7/VNTraffic.npz
+[B1_live_pt] VNTraffic: {"frames": 510, "detector": "live", "frames_detected": 510, "frames_skipped": 0, "skip_ratio": 0.0, "decode_ms": 4.794, "decision_ms": 0.0, "est_ms_on_skipped": null, "track_ms_on_detected": 7.406, "mean_dets_per_detected_frame": 48.518, "mean_tracks_per_frame": 30.208, "det_total_ms_on_detected": 35.475, "det_infer_ms_on_detected": 27.57, "proc_ms_per_frame": 42.88, "fps_proc": 23.3, "fps_with_decode": 21.0, "rows_kept": 15117, "rows_removed_outside_gt_range": 289}
+[B1_live_pt] AICC22-Custom: detection cache -> /home/orin/emo/EmoOcSortJetson/outputs/dets_cache/yolov5x_384x640_fp16_conf0.1_iou0.45_agn_c2-3-5-7/AICC22-Custom.npz
+[B1_live_pt] AICC22-Custom: {"frames": 200, "detector": "live", "frames_detected": 200, "frames_skipped": 0, "skip_ratio": 0.0, "decode_ms": 2.317, "decision_ms": 0.0, "est_ms_on_skipped": null, "track_ms_on_detected": 3.451, "mean_dets_per_detected_frame": 13.215, "mean_tracks_per_frame": 8.005, "det_total_ms_on_detected": 33.246, "det_infer_ms_on_detected": 27.653, "proc_ms_per_frame": 36.7, "fps_proc": 27.2, "fps_with_decode": 25.6, "rows_kept": 1582, "rows_removed_outside_gt_range": 19}
+Error importing BURST due to missing underlying dependency: No module named 'pycocotools'
+
+[B1_live_pt] seq            |   HOTA |   DetA |   AssA |   LocA |   MOTA |   MOTP |   IDF1 |   IDSW |     FP |     FN
+[B1_live_pt] AICC22-Custom  |  65.49 |  57.38 |  75.23 |  89.21 |  48.61 |  88.19 |  77.99 |      0 |    503 |    106
+[B1_live_pt] VNTraffic      |  75.49 |  77.09 |  74.15 |  90.00 |  87.18 |  88.73 |  84.84 |     42 |    564 |   1445
+[B1_live_pt] COMBINED_SEQ   |  74.63 |  75.29 |  74.22 |  89.95 |  84.52 |  88.69 |  84.28 |     42 |   1067 |   1551
+[B1_live_pt] results in /home/orin/emo/EmoOcSortJetson/outputs/jetson/B1_live_pt
+== 5. 4 streams: 1-stream reference, k sweep, offline throughput (TensorRT)
+[run ] RT1_B1: --streams 1 --offsets 0
+[RT1_B1] 1 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'none', 'k': 4, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=True, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT1_B1] wall 16.99 s | processed 508/510 (dropped 0.4%) | skip 0.0% of processed | throughput 29.9 FPS (demand 30.0) | batches {'1': 508}
+[RT1_B1] ms per processed frame: {'decision': 0.0, 'advance': 0.003, 'est': 0.0, 'det': 16.059, 'track': 6.546, 'tick': 6.717}
+[RT1_B1] det ms per batch: {'1': 16.06} (forward {'1': 8.44})
+[RT1_B1] HOTA 74.87±0.00 | DetA 76.57±0.00 | AssA 73.42±0.00 | LocA 90.01±0.00 | MOTA 86.58±0.00 | IDF1 84.39±0.00 | IDSW 44.00±0.00 | FP 552.00±0.00 | FN 1551.00±0.00
+[run ] RT_B1: 
+[RT_B1] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'none', 'k': 4, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=True, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B1] wall 17.74 s | processed 477/2040 (dropped 76.6%) | skip 0.0% of processed | throughput 26.9 FPS (demand 120.0) | batches {'1': 14, '2': 8, '3': 5, '4': 108}
+[RT_B1] ms per processed frame: {'decision': 0.0, 'advance': 4.545, 'est': 0.0, 'det': 13.566, 'track': 18.748, 'tick': 23.45}
+[RT_B1] det ms per batch: {'1': 22.59, '2': 28.61, '3': 40.54, '4': 52.99} (forward {'1': 8.49, '2': 14.32, '3': 19.75, '4': 25.8})
+[RT_B1] HOTA 17.36±0.76 | DetA 17.23±0.65 | AssA 17.52±0.91 | LocA 90.10±0.09 | MOTA 18.47±0.66 | IDF1 30.07±0.99 | IDSW 16.50±1.12 | FP 104.00±10.32 | FN 12922.00±116.61
+[run ] RT_B3_k2_fast: --policy periodic_est --k 2 --skip_oru False
+[RT_B3_k2_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'periodic_est', 'k': 2, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B3_k2_fast] wall 17.72 s | processed 1877/2040 (dropped 8.0%) | skip 66.6% of processed | throughput 105.9 FPS (demand 120.0) | batches {'1': 41, '2': 293}
+[RT_B3_k2_fast] ms per processed frame: {'decision': 0.0, 'advance': 0.191, 'est': 1.706, 'det': 4.93, 'track': 3.031, 'tick': 5.067}
+[RT_B3_k2_fast] det ms per batch: {'1': 18.56, '2': 28.98} (forward {'1': 8.5, '2': 14.33})
+[RT_B3_k2_fast] HOTA 64.85±0.08 | DetA 64.54±0.10 | AssA 65.35±0.17 | LocA 88.45±0.07 | MOTA 73.69±0.30 | IDF1 80.38±0.06 | IDSW 21.50±1.66 | FP 592.50±31.29 | FN 3594.25±17.77
+[run ] RT_B3_k3_fast: --policy periodic_est --k 3 --skip_oru False
+[RT_B3_k3_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'periodic_est', 'k': 3, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B3_k3_fast] wall 17.72 s | processed 2028/2040 (dropped 0.6%) | skip 75.0% of processed | throughput 114.5 FPS (demand 120.0) | batches {'1': 494, '2': 7}
+[RT_B3_k3_fast] ms per processed frame: {'decision': 0.0, 'advance': 0.013, 'est': 2.183, 'det': 4.255, 'track': 2.498, 'tick': 4.836}
+[RT_B3_k3_fast] det ms per batch: {'1': 17.05, '2': 29.36} (forward {'1': 8.48, '2': 14.36})
+[RT_B3_k3_fast] HOTA 68.63±0.65 | DetA 68.18±0.42 | AssA 69.29±1.19 | LocA 88.45±0.21 | MOTA 78.02±0.32 | IDF1 82.85±1.22 | IDSW 22.25±3.49 | FP 631.25±24.41 | FN 2862.25±28.32
+[run ] RT_B3_k4_fast: --policy periodic_est --k 4 --skip_oru False
+[RT_B3_k4_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'periodic_est', 'k': 4, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B3_k4_fast] wall 17.75 s | processed 1928/2040 (dropped 5.5%) | skip 79.9% of processed | throughput 108.6 FPS (demand 120.0) | batches {'1': 200, '2': 94}
+[RT_B3_k4_fast] ms per processed frame: {'decision': 0.0, 'advance': 0.2, 'est': 3.261, 'det': 3.386, 'track': 2.928, 'tick': 6.518}
+[RT_B3_k4_fast] det ms per batch: {'1': 18.7, '2': 29.67} (forward {'1': 8.59, '2': 14.43})
+[RT_B3_k4_fast] HOTA 61.03±0.95 | DetA 60.09±0.45 | AssA 62.15±1.47 | LocA 88.26±0.17 | MOTA 67.77±0.81 | IDF1 75.49±1.54 | IDSW 22.25±1.92 | FP 673.25±11.58 | FN 4461.50±129.65
+[run ] RT_B3_k5_fast: --policy periodic_est --k 5 --skip_oru False
+[RT_B3_k5_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'periodic_est', 'k': 5, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B3_k5_fast] wall 17.73 s | processed 1694/2040 (dropped 17.0%) | skip 83.2% of processed | throughput 95.5 FPS (demand 120.0) | batches {'1': 222, '2': 31}
+[RT_B3_k5_fast] ms per processed frame: {'decision': 0.0, 'advance': 0.764, 'est': 4.288, 'det': 3.104, 'track': 3.204, 'tick': 8.376}
+[RT_B3_k5_fast] det ms per batch: {'1': 19.18, '2': 32.28} (forward {'1': 8.6, '2': 14.43})
+[RT_B3_k5_fast] HOTA 51.78±0.29 | DetA 48.33±0.44 | AssA 55.57±0.66 | LocA 88.30±0.13 | MOTA 53.40±0.52 | IDF1 67.24±0.68 | IDSW 15.25±1.30 | FP 563.25±15.37 | FN 6876.50±94.53
+[run ] RT_B3_k6_fast: --policy periodic_est --k 6 --skip_oru False
+[RT_B3_k6_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'periodic_est', 'k': 6, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B3_k6_fast] wall 17.73 s | processed 1475/2040 (dropped 27.7%) | skip 85.6% of processed | throughput 83.2 FPS (demand 120.0) | batches {'1': 209, '2': 2}
+[RT_B3_k6_fast] ms per processed frame: {'decision': 0.0, 'advance': 1.83, 'est': 4.843, 'det': 2.917, 'track': 3.448, 'tick': 10.236}
+[RT_B3_k6_fast] det ms per batch: {'1': 20.3, '2': 29.52} (forward {'1': 8.63, '2': 14.41})
+[RT_B3_k6_fast] HOTA 43.12±0.79 | DetA 38.49±0.41 | AssA 48.38±1.29 | LocA 87.88±0.14 | MOTA 41.76±0.49 | IDF1 58.15±0.88 | IDSW 13.50±2.69 | FP 521.25±39.26 | FN 8782.50±85.06
+[run ] RT_NCC0.75_k4_fast: --policy ncc --k 4 --sim_thresh 0.75 --skip_oru False
+[RT_NCC0.75_k4_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'ncc', 'k': 4, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_NCC0.75_k4_fast] wall 17.76 s | processed 1001/2040 (dropped 50.9%) | skip 65.2% of processed | throughput 56.4 FPS (demand 120.0) | batches {'1': 64, '2': 72, '3': 24, '4': 17}
+[RT_NCC0.75_k4_fast] ms per processed frame: {'decision': 5.182, 'advance': 1.775, 'est': 3.017, 'det': 5.526, 'track': 4.907, 'tick': 15.054}
+[RT_NCC0.75_k4_fast] det ms per batch: {'1': 20.69, '2': 32.09, '3': 41.46, '4': 53.02} (forward {'1': 8.93, '2': 14.47, '3': 19.77, '4': 25.8})
+[RT_NCC0.75_k4_fast] HOTA 33.34±1.07 | DetA 31.90±1.05 | AssA 34.91±1.12 | LocA 88.16±0.28 | MOTA 34.87±1.29 | IDF1 50.44±1.71 | IDSW 14.50±1.12 | FP 340.00±29.67 | FN 10065.25±232.60
+[run ] RT_NCC0.75_k6_fast: --policy ncc --k 6 --sim_thresh 0.75 --skip_oru False
+[RT_NCC0.75_k6_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'ncc', 'k': 6, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_NCC0.75_k6_fast] wall 17.77 s | processed 994/2040 (dropped 51.3%) | skip 74.2% of processed | throughput 55.9 FPS (demand 120.0) | batches {'1': 75, '2': 49, '3': 9, '4': 14}
+[RT_NCC0.75_k6_fast] ms per processed frame: {'decision': 5.041, 'advance': 2.672, 'est': 3.917, 'det': 4.513, 'track': 4.47, 'tick': 16.262}
+[RT_NCC0.75_k6_fast] det ms per batch: {'1': 22.73, '2': 33.97, '3': 41.48, '4': 53.1} (forward {'1': 8.9, '2': 14.53, '3': 19.8, '4': 25.82})
+[RT_NCC0.75_k6_fast] HOTA 30.98±1.29 | DetA 28.11±1.20 | AssA 34.18±1.41 | LocA 87.61±0.17 | MOTA 30.29±1.45 | IDF1 46.19±1.93 | IDSW 13.25±0.83 | FP 381.25±14.36 | FN 10757.75±239.63
+[run ] OFF_B1: --mode offline
+[OFF_B1] 4 x VNTraffic (510 frames, 30 FPS), mode=offline, policy={'name': 'none', 'k': 4, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=True, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[OFF_B1] wall 41.6 s | processed 2040/2040 (dropped 0.0%) | skip 0.0% of processed | throughput 49.0 FPS (demand 120.0) | batches {'1': 15, '2': 14, '3': 15, '4': 488}
+[OFF_B1] ms per processed frame: {'decision': 0.0, 'advance': 0.0, 'est': 0.0, 'det': 13.256, 'track': 6.925, 'tick': 7.071}
+[OFF_B1] det ms per batch: {'1': 22.09, '2': 28.46, '3': 40.33, '4': 52.68} (forward {'1': 8.5, '2': 14.32, '3': 19.71, '4': 25.79})
+[OFF_B1] HOTA 75.55±0.00 | DetA 77.15±0.01 | AssA 74.20±0.00 | LocA 90.00±0.00 | MOTA 87.26±0.01 | IDF1 84.89±0.01 | IDSW 43.00±0.00 | FP 565.00±0.00 | FN 1429.50±1.50
+[run ] OFF_B3_k3_fast: --mode offline --policy periodic_est --k 3 --skip_oru False
+[OFF_B3_k3_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=offline, policy={'name': 'periodic_est', 'k': 3, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[OFF_B3_k3_fast] wall 14.16 s | processed 2040/2040 (dropped 0.0%) | skip 74.9% of processed | throughput 144.1 FPS (demand 120.0) | batches {'1': 16, '2': 248}
+[OFF_B3_k3_fast] ms per processed frame: {'decision': 0.0, 'advance': 0.0, 'est': 1.981, 'det': 3.738, 'track': 2.452, 'tick': 4.559}
+[OFF_B3_k3_fast] det ms per batch: {'1': 22.16, '2': 29.31} (forward {'1': 8.54, '2': 14.35})
+[OFF_B3_k3_fast] HOTA 69.86±0.00 | DetA 69.24±0.00 | AssA 70.66±0.00 | LocA 88.64±0.00 | MOTA 79.05±0.00 | IDF1 83.91±0.00 | IDSW 19.00±0.00 | FP 637.00±0.00 | FN 2695.00±0.00
+[run ] OFF_B3_k6_fast: --mode offline --policy periodic_est --k 6 --skip_oru False
+[OFF_B3_k6_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=offline, policy={'name': 'periodic_est', 'k': 6, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[OFF_B3_k6_fast] wall 18.9 s | processed 2040/2040 (dropped 0.0%) | skip 85.7% of processed | throughput 107.9 FPS (demand 120.0) | batches {'1': 75, '2': 2, '3': 71}
+[OFF_B3_k6_fast] ms per processed frame: {'decision': 0.0, 'advance': 0.0, 'est': 4.761, 'det': 2.235, 'track': 3.134, 'tick': 8.0}
+[OFF_B3_k6_fast] det ms per batch: {'1': 21.62, '2': 28.97, '3': 40.55} (forward {'1': 8.7, '2': 14.4, '3': 19.75})
+[OFF_B3_k6_fast] HOTA 60.50±0.17 | DetA 56.34±0.01 | AssA 65.05±0.36 | LocA 88.75±0.01 | MOTA 62.21±0.02 | IDF1 73.50±0.52 | IDSW 17.50±0.87 | FP 651.75±0.43 | FN 5377.00±3.46
+[run ] OFF_B3_k6_fast_noO7: --mode offline --policy periodic_est --k 6 --skip_oru False --cuda_graph 0 --switch_interval 0
+[OFF_B3_k6_fast_noO7] 4 x VNTraffic (510 frames, 30 FPS), mode=offline, policy={'name': 'periodic_est', 'k': 6, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=False, switch_interval=0.005
+[OFF_B3_k6_fast_noO7] wall 18.78 s | processed 2040/2040 (dropped 0.0%) | skip 85.7% of processed | throughput 108.6 FPS (demand 120.0) | batches {'1': 75, '2': 2, '3': 71}
+[OFF_B3_k6_fast_noO7] ms per processed frame: {'decision': 0.0, 'advance': 0.0, 'est': 4.718, 'det': 2.25, 'track': 3.103, 'tick': 7.925}
+[OFF_B3_k6_fast_noO7] det ms per batch: {'1': 21.77, '2': 29.09, '3': 40.81} (forward {'1': 8.72, '2': 14.41, '3': 19.77})
+[OFF_B3_k6_fast_noO7] HOTA 60.50±0.17 | DetA 56.34±0.01 | AssA 65.05±0.36 | LocA 88.75±0.01 | MOTA 62.21±0.02 | IDF1 73.50±0.52 | IDSW 17.50±0.87 | FP 651.75±0.43 | FN 5377.00±3.46
+[run ] OFF_B3_k6_fast_sync: --mode offline --policy periodic_est --k 6 --skip_oru False --async_gpu 0
+[OFF_B3_k6_fast_sync] 4 x VNTraffic (510 frames, 30 FPS), mode=offline, policy={'name': 'periodic_est', 'k': 6, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=False, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[OFF_B3_k6_fast_sync] wall 20.54 s | processed 2040/2040 (dropped 0.0%) | skip 85.7% of processed | throughput 99.3 FPS (demand 120.0) | batches {'0': 384, '1': 75, '2': 2, '3': 71}
+[OFF_B3_k6_fast_sync] ms per processed frame: {'decision': 0.0, 'advance': 0.0, 'est': 4.659, 'det': 2.117, 'track': 3.183, 'tick': 10.063}
+[OFF_B3_k6_fast_sync] det ms per batch: {'1': 18.13, '2': 29.14, '3': 40.84} (forward {'1': 8.72, '2': 14.42, '3': 19.79})
+[OFF_B3_k6_fast_sync] HOTA 60.50±0.17 | DetA 56.34±0.01 | AssA 65.05±0.36 | LocA 88.75±0.01 | MOTA 62.21±0.02 | IDF1 73.50±0.52 | IDSW 17.50±0.87 | FP 651.75±0.43 | FN 5377.00±3.46
+| exp | mode | async | closed_form | drops_count | graph | swi_ms | streams | policy | k | sim | oru | drop% | skip%_of_processed | detect%_of_all | throughput_fps | demand_fps | ms_decision | ms_advance | ms_est | ms_det | ms_track | ms_tick | det_ms_b1 | det_ms_b4 | latency_ms | latency_p95_ms | HOTA | DetA | AssA | MOTA | IDF1 | IDSW | FN |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| OFF_B1 | offline | 1 | 1 | 0 | 1 | 0.5 | 4 | none |  |  | exact | 0.0 | 0.0 | 100.0 | 49.0 | 120.0 | 0.0 | 0.0 | 0.0 | 13.256 | 6.925 | 7.071 | 22.09 | 52.68 |  |  | 75.55±0.00 | 77.15 | 74.2 | 87.26 | 84.89 | 43.0 | 1430.0 |
+| OFF_B3_k3_fast | offline | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 3 |  | fast | 0.0 | 74.9 | 25.1 | 144.1 | 120.0 | 0.0 | 0.0 | 1.981 | 3.738 | 2.452 | 4.559 | 22.16 | None |  |  | 69.86±0.00 | 69.24 | 70.66 | 79.05 | 83.91 | 19.0 | 2695.0 |
+| OFF_B3_k6_fast | offline | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 6 |  | fast | 0.0 | 85.7 | 14.3 | 107.9 | 120.0 | 0.0 | 0.0 | 4.761 | 2.235 | 3.134 | 8.0 | 21.62 | None |  |  | 60.50±0.17 | 56.34 | 65.05 | 62.21 | 73.5 | 17.5 | 5377.0 |
+| OFF_B3_k6_fast_noO7 | offline | 1 | 1 | 0 | 0 | 5.0 | 4 | periodic_est | 6 |  | fast | 0.0 | 85.7 | 14.3 | 108.6 | 120.0 | 0.0 | 0.0 | 4.718 | 2.25 | 3.103 | 7.925 | 21.77 | None |  |  | 60.50±0.17 | 56.34 | 65.05 | 62.21 | 73.5 | 17.5 | 5377.0 |
+| OFF_B3_k6_fast_sync | offline | 0 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 6 |  | fast | 0.0 | 85.7 | 14.3 | 99.3 | 120.0 | 0.0 | 0.0 | 4.659 | 2.117 | 3.183 | 10.063 | 18.13 | None |  |  | 60.50±0.17 | 56.34 | 65.05 | 62.21 | 73.5 | 17.5 | 5377.0 |
+| RT1_B1 | realtime | 1 | 1 | 0 | 1 | 0.5 | 1 | none |  |  | exact | 0.4 | 0.0 | 99.6 | 29.9 | 30.0 | 0.0 | 0.003 | 0.0 | 16.059 | 6.546 | 6.717 | 16.06 | None | 23.0 | 24.1 | 74.87±0.00 | 76.57 | 73.42 | 86.58 | 84.39 | 44.0 | 1551.0 |
+| RT_B1 | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | none |  |  | exact | 76.6 | 0.0 | 23.4 | 26.9 | 120.0 | 0.0 | 4.545 | 0.0 | 13.566 | 18.748 | 23.45 | 22.59 | 52.99 | 133.0 | 193.7 | 17.36±0.76 | 17.23 | 17.52 | 18.47 | 30.07 | 16.5 | 12922.0 |
+| RT_B3_k2_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 2 |  | fast | 8.0 | 66.6 | 30.7 | 105.9 | 120.0 | 0.0 | 0.191 | 1.706 | 4.93 | 3.031 | 5.067 | 18.56 | None | 28.1 | 73.0 | 64.85±0.08 | 64.54 | 65.35 | 73.69 | 80.38 | 21.5 | 3594.0 |
+| RT_B3_k3_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 3 |  | fast | 0.6 | 75.0 | 24.9 | 114.5 | 120.0 | 0.0 | 0.013 | 2.183 | 4.255 | 2.498 | 4.836 | 17.05 | None | 16.4 | 53.1 | 68.63±0.65 | 68.18 | 69.29 | 78.02 | 82.85 | 22.2 | 2862.0 |
+| RT_B3_k4_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 4 |  | fast | 5.5 | 79.9 | 19.0 | 108.6 | 120.0 | 0.0 | 0.2 | 3.261 | 3.386 | 2.928 | 6.518 | 18.7 | None | 23.2 | 69.5 | 61.03±0.95 | 60.09 | 62.15 | 67.77 | 75.49 | 22.2 | 4462.0 |
+| RT_B3_k5_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 5 |  | fast | 17.0 | 83.2 | 13.9 | 95.5 | 120.0 | 0.0 | 0.764 | 4.288 | 3.104 | 3.204 | 8.376 | 19.18 | None | 28.4 | 110.2 | 51.78±0.29 | 48.33 | 55.57 | 53.4 | 67.24 | 15.2 | 6876.0 |
+| RT_B3_k6_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 6 |  | fast | 27.7 | 85.6 | 10.4 | 83.2 | 120.0 | 0.0 | 1.83 | 4.843 | 2.917 | 3.448 | 10.236 | 20.3 | None | 33.5 | 105.3 | 43.12±0.79 | 38.49 | 48.38 | 41.76 | 58.15 | 13.5 | 8782.0 |
+| RT_NCC0.75_k4_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | ncc | 4 | 0.75 | fast | 50.9 | 65.2 | 17.1 | 56.4 | 120.0 | 5.182 | 1.775 | 3.017 | 5.526 | 4.907 | 15.054 | 20.69 | 53.02 | 67.2 | 180.8 | 33.34±1.07 | 31.9 | 34.91 | 34.87 | 50.44 | 14.5 | 10065.0 |
+| RT_NCC0.75_k6_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | ncc | 6 | 0.75 | fast | 51.3 | 74.2 | 12.6 | 55.9 | 120.0 | 5.041 | 2.672 | 3.917 | 4.513 | 4.47 | 16.262 | 22.73 | 53.1 | 64.4 | 181.1 | 30.98±1.29 | 28.11 | 34.18 | 30.29 | 46.19 | 13.2 | 10758.0 |
+== 6. same with PyTorch FP16 + CUDA graph (comparison)
+[run ] RT1_B1: --streams 1 --offsets 0
+[RT1_B1] 1 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'none', 'k': 4, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=True, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT1_B1] wall 17.0 s | processed 508/510 (dropped 0.4%) | skip 0.0% of processed | throughput 29.9 FPS (demand 30.0) | batches {'1': 508}
+[RT1_B1] ms per processed frame: {'decision': 0.0, 'advance': 0.007, 'est': 0.0, 'det': 26.211, 'track': 6.478, 'tick': 6.653}
+[RT1_B1] det ms per batch: {'1': 26.21} (forward {'1': 18.66})
+[RT1_B1] HOTA 75.11±0.00 | DetA 76.66±0.00 | AssA 73.81±0.00 | LocA 90.03±0.00 | MOTA 86.64±0.00 | IDF1 84.63±0.00 | IDSW 42.00±0.00 | FP 557.00±0.00 | FN 1539.00±0.00
+[run ] RT_B1: 
+[RT_B1] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'none', 'k': 4, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=True, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B1] wall 17.8 s | processed 322/2040 (dropped 84.2%) | skip 0.0% of processed | throughput 18.1 FPS (demand 120.0) | batches {'1': 7, '2': 5, '3': 3, '4': 74}
+[RT_B1] ms per processed frame: {'decision': 0.0, 'advance': 6.014, 'est': 0.0, 'det': 22.361, 'track': 26.652, 'tick': 32.816}
+[RT_B1] det ms per batch: {'1': 36.3, '2': 48.03, '3': 68.14, '4': 87.86} (forward {'1': 18.8, '2': 33.75, '3': 47.27, '4': 60.49})
+[RT_B1] HOTA 11.38±0.90 | DetA 10.76±0.74 | AssA 12.06±1.07 | LocA 90.73±0.07 | MOTA 11.34±0.79 | IDF1 19.79±1.26 | IDSW 12.50±0.50 | FP 64.00±7.35 | FN 14107.75±132.72
+[run ] RT_B3_k2_fast: --policy periodic_est --k 2 --skip_oru False
+[RT_B3_k2_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'periodic_est', 'k': 2, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B3_k2_fast] wall 17.75 s | processed 1194/2040 (dropped 41.5%) | skip 66.5% of processed | throughput 67.2 FPS (demand 120.0) | batches {'1': 24, '2': 188}
+[RT_B3_k2_fast] ms per processed frame: {'decision': 0.0, 'advance': 0.943, 'est': 2.211, 'det': 8.221, 'track': 4.279, 'tick': 7.568}
+[RT_B3_k2_fast] det ms per batch: {'1': 29.37, '2': 48.46} (forward {'1': 18.75, '2': 33.76})
+[RT_B3_k2_fast] HOTA 39.12±0.58 | DetA 38.53±0.42 | AssA 39.81±0.76 | LocA 88.15±0.15 | MOTA 42.51±0.51 | IDF1 56.88±0.87 | IDSW 19.25±1.78 | FP 420.50±13.59 | FN 8758.25±92.69
+[run ] RT_B3_k3_fast: --policy periodic_est --k 3 --skip_oru False
+[RT_B3_k3_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'periodic_est', 'k': 3, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B3_k3_fast] wall 17.72 s | processed 1461/2040 (dropped 28.4%) | skip 75.0% of processed | throughput 82.4 FPS (demand 120.0) | batches {'1': 80, '2': 143}
+[RT_B3_k3_fast] ms per processed frame: {'decision': 0.0, 'advance': 0.789, 'est': 2.683, 'det': 6.348, 'track': 3.479, 'tick': 7.082}
+[RT_B3_k3_fast] det ms per batch: {'1': 27.63, '2': 49.4} (forward {'1': 18.75, '2': 33.75})
+[RT_B3_k3_fast] HOTA 47.31±0.47 | DetA 45.82±0.30 | AssA 48.97±0.89 | LocA 88.00±0.11 | MOTA 50.99±0.19 | IDF1 65.04±0.50 | IDSW 16.75±1.64 | FP 509.00±32.46 | FN 7314.75±61.35
+[run ] RT_B3_k4_fast: --policy periodic_est --k 4 --skip_oru False
+[RT_B3_k4_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'periodic_est', 'k': 4, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B3_k4_fast] wall 17.72 s | processed 1359/2040 (dropped 33.4%) | skip 79.9% of processed | throughput 76.7 FPS (demand 120.0) | batches {'1': 57, '2': 108}
+[RT_B3_k4_fast] ms per processed frame: {'decision': 0.0, 'advance': 1.369, 'est': 4.053, 'det': 5.216, 'track': 3.933, 'tick': 9.475}
+[RT_B3_k4_fast] det ms per batch: {'1': 28.06, '2': 50.82} (forward {'1': 18.79, '2': 33.83})
+[RT_B3_k4_fast] HOTA 41.61±0.35 | DetA 38.49±0.29 | AssA 45.04±0.55 | LocA 87.89±0.18 | MOTA 42.10±0.54 | IDF1 58.26±0.56 | IDSW 14.25±1.78 | FP 484.25±29.84 | FN 8763.75±71.09
+[run ] RT_B3_k5_fast: --policy periodic_est --k 5 --skip_oru False
+[RT_B3_k5_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'periodic_est', 'k': 5, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B3_k5_fast] wall 17.72 s | processed 1560/2040 (dropped 23.5%) | skip 83.3% of processed | throughput 88.0 FPS (demand 120.0) | batches {'1': 199, '2': 31}
+[RT_B3_k5_fast] ms per processed frame: {'decision': 0.0, 'advance': 0.823, 'est': 4.384, 'det': 4.667, 'track': 3.374, 'tick': 8.704}
+[RT_B3_k5_fast] det ms per batch: {'1': 28.68, '2': 50.77} (forward {'1': 18.82, '2': 33.84})
+[RT_B3_k5_fast] HOTA 46.95±0.63 | DetA 43.33±0.55 | AssA 50.95±0.72 | LocA 87.81±0.20 | MOTA 47.68±0.74 | IDF1 63.37±0.89 | IDSW 14.00±1.87 | FP 574.75±13.55 | FN 7782.00±124.42
+[run ] RT_B3_k6_fast: --policy periodic_est --k 6 --skip_oru False
+[RT_B3_k6_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'periodic_est', 'k': 6, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_B3_k6_fast] wall 17.72 s | processed 1503/2040 (dropped 26.3%) | skip 85.6% of processed | throughput 84.8 FPS (demand 120.0) | batches {'1': 178, '2': 19}
+[RT_B3_k6_fast] ms per processed frame: {'decision': 0.0, 'advance': 1.171, 'est': 4.789, 'det': 4.072, 'track': 3.507, 'tick': 9.582}
+[RT_B3_k6_fast] det ms per batch: {'1': 28.96, '2': 50.81} (forward {'1': 18.84, '2': 33.83})
+[RT_B3_k6_fast] HOTA 43.52±0.21 | DetA 38.99±0.14 | AssA 48.63±0.46 | LocA 87.90±0.15 | MOTA 42.31±0.10 | IDF1 58.70±0.24 | IDSW 14.50±1.80 | FP 533.25±7.16 | FN 8681.50±10.43
+[run ] RT_NCC0.75_k4_fast: --policy ncc --k 4 --sim_thresh 0.75 --skip_oru False
+[RT_NCC0.75_k4_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'ncc', 'k': 4, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_NCC0.75_k4_fast] wall 17.76 s | processed 752/2040 (dropped 63.1%) | skip 54.5% of processed | throughput 42.3 FPS (demand 120.0) | batches {'1': 28, '2': 39, '3': 32, '4': 35}
+[RT_NCC0.75_k4_fast] ms per processed frame: {'decision': 5.291, 'advance': 1.777, 'est': 2.448, 'det': 10.862, 'track': 6.229, 'tick': 15.922}
+[RT_NCC0.75_k4_fast] det ms per batch: {'1': 31.21, '2': 50.51, '3': 70.58, '4': 87.6} (forward {'1': 18.92, '2': 33.91, '3': 47.48, '4': 60.53})
+[RT_NCC0.75_k4_fast] HOTA 25.33±0.16 | DetA 24.19±0.32 | AssA 26.57±0.49 | LocA 88.40±0.30 | MOTA 26.14±0.51 | IDF1 41.00±0.73 | IDSW 14.00±2.55 | FP 251.50±10.83 | FN 11551.25±82.36
+[run ] RT_NCC0.75_k6_fast: --policy ncc --k 6 --sim_thresh 0.75 --skip_oru False
+[RT_NCC0.75_k6_fast] 4 x VNTraffic (510 frames, 30 FPS), mode=realtime, policy={'name': 'ncc', 'k': 6, 'sim_thresh': 0.75, 'afd': True, 'drops_count': False}, skip_mode=V1, skip_oru=False, fp16=True, async_gpu=True, closed_form=True, cuda_graph=True, switch_interval=0.0005
+[RT_NCC0.75_k6_fast] wall 17.77 s | processed 830/2040 (dropped 59.3%) | skip 65.2% of processed | throughput 46.7 FPS (demand 120.0) | batches {'1': 37, '2': 37, '3': 22, '4': 28}
+[RT_NCC0.75_k6_fast] ms per processed frame: {'decision': 5.189, 'advance': 2.078, 'est': 3.135, 'det': 8.532, 'track': 5.491, 'tick': 16.062}
+[RT_NCC0.75_k6_fast] det ms per batch: {'1': 31.23, '2': 52.19, '3': 69.93, '4': 87.73} (forward {'1': 19.04, '2': 34.03, '3': 47.42, '4': 60.48})
+[RT_NCC0.75_k6_fast] HOTA 27.47±0.40 | DetA 25.04±0.63 | AssA 30.20±0.46 | LocA 87.93±0.40 | MOTA 27.02±0.90 | IDF1 42.74±0.93 | IDSW 11.25±2.17 | FP 294.25±16.15 | FN 11370.25±148.05
+| exp | mode | async | closed_form | drops_count | graph | swi_ms | streams | policy | k | sim | oru | drop% | skip%_of_processed | detect%_of_all | throughput_fps | demand_fps | ms_decision | ms_advance | ms_est | ms_det | ms_track | ms_tick | det_ms_b1 | det_ms_b4 | latency_ms | latency_p95_ms | HOTA | DetA | AssA | MOTA | IDF1 | IDSW | FN |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| RT1_B1 | realtime | 1 | 1 | 0 | 1 | 0.5 | 1 | none |  |  | exact | 0.4 | 0.0 | 99.6 | 29.9 | 30.0 | 0.0 | 0.007 | 0.0 | 26.211 | 6.478 | 6.653 | 26.21 | None | 34.2 | 38.9 | 75.11±0.00 | 76.66 | 73.81 | 86.64 | 84.63 | 42.0 | 1539.0 |
+| RT_B1 | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | none |  |  | exact | 84.2 | 0.0 | 15.8 | 18.1 | 120.0 | 0.0 | 6.014 | 0.0 | 22.361 | 26.652 | 32.816 | 36.3 | 87.86 | 194.0 | 300.5 | 11.38±0.90 | 10.76 | 12.06 | 11.34 | 19.79 | 12.5 | 14108.0 |
+| RT_B3_k2_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 2 |  | fast | 41.5 | 66.5 | 19.6 | 67.2 | 120.0 | 0.0 | 0.943 | 2.211 | 8.221 | 4.279 | 7.568 | 29.37 | None | 49.2 | 147.5 | 39.12±0.58 | 38.53 | 39.81 | 42.51 | 56.88 | 19.2 | 8758.0 |
+| RT_B3_k3_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 3 |  | fast | 28.4 | 75.0 | 17.9 | 82.4 | 120.0 | 0.0 | 0.789 | 2.683 | 6.348 | 3.479 | 7.082 | 27.63 | None | 34.2 | 123.4 | 47.31±0.47 | 45.82 | 48.97 | 50.99 | 65.04 | 16.8 | 7315.0 |
+| RT_B3_k4_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 4 |  | fast | 33.4 | 79.9 | 13.4 | 76.7 | 120.0 | 0.0 | 1.369 | 4.053 | 5.216 | 3.933 | 9.475 | 28.06 | None | 38.1 | 154.3 | 41.61±0.35 | 38.49 | 45.04 | 42.1 | 58.26 | 14.2 | 8764.0 |
+| RT_B3_k5_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 5 |  | fast | 23.5 | 83.3 | 12.8 | 88.0 | 120.0 | 0.0 | 0.823 | 4.384 | 4.667 | 3.374 | 8.704 | 28.68 | None | 32.2 | 132.8 | 46.95±0.63 | 43.33 | 50.95 | 47.68 | 63.37 | 14.0 | 7782.0 |
+| RT_B3_k6_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | periodic_est | 6 |  | fast | 26.3 | 85.6 | 10.6 | 84.8 | 120.0 | 0.0 | 1.171 | 4.789 | 4.072 | 3.507 | 9.582 | 28.96 | None | 33.3 | 128.9 | 43.52±0.21 | 38.99 | 48.63 | 42.31 | 58.7 | 14.5 | 8682.0 |
+| RT_NCC0.75_k4_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | ncc | 4 | 0.75 | fast | 63.1 | 54.5 | 16.8 | 42.3 | 120.0 | 5.291 | 1.777 | 2.448 | 10.862 | 6.229 | 15.922 | 31.21 | 87.6 | 86.8 | 219.7 | 25.33±0.16 | 24.19 | 26.57 | 26.14 | 41.0 | 14.0 | 11551.0 |
+| RT_NCC0.75_k6_fast | realtime | 1 | 1 | 0 | 1 | 0.5 | 4 | ncc | 6 | 0.75 | fast | 59.3 | 65.2 | 14.2 | 46.7 | 120.0 | 5.189 | 2.078 | 3.135 | 8.532 | 5.491 | 16.062 | 31.23 | 87.73 | 79.5 | 224.6 | 27.47±0.40 | 25.04 | 30.2 | 27.02 | 42.74 | 11.2 | 11370.0 |
+done: results in /home/orin/emo/EmoOcSortJetson/outputs/{jetson,jetson_trt,jetson_pt}

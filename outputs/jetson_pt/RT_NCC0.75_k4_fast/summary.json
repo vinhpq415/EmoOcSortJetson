@@ -1,0 +1,81 @@
+{
+  "mode": "realtime",
+  "async_gpu": true,
+  "closed_form_advance": true,
+  "streams": 4,
+  "wall_s": 17.76,
+  "ticks": 497,
+  "frames_total": 2040,
+  "frames_processed": 752,
+  "frames_dropped": 1288,
+  "drop_ratio": 0.6314,
+  "skip_ratio_of_processed": 0.5452,
+  "detect_ratio_of_all": 0.1676,
+  "throughput_fps": 42.3,
+  "demand_fps": 120.0,
+  "batch_hist": {
+    "1": 28,
+    "2": 39,
+    "3": 32,
+    "4": 35
+  },
+  "ms_per_processed_frame": {
+    "decision": 5.291,
+    "advance": 1.777,
+    "est": 2.448,
+    "det": 10.862,
+    "track": 6.229,
+    "tick": 15.922
+  },
+  "det_ms_per_batch": {
+    "1": 31.21,
+    "2": 50.51,
+    "3": 70.58,
+    "4": 87.6
+  },
+  "det_infer_ms_per_batch": {
+    "1": 18.92,
+    "2": 33.91,
+    "3": 47.48,
+    "4": 60.53
+  },
+  "per_stream": [
+    {
+      "sid": 0,
+      "offset_s": 0.0,
+      "processed": 187,
+      "dropped": 323,
+      "skipped": 100,
+      "latency_ms_mean": 78.2,
+      "latency_ms_p95": 167.5
+    },
+    {
+      "sid": 1,
+      "offset_s": 0.25,
+      "processed": 183,
+      "dropped": 327,
+      "skipped": 94,
+      "latency_ms_mean": 89.1,
+      "latency_ms_p95": 186.2
+    },
+    {
+      "sid": 2,
+      "offset_s": 0.5,
+      "processed": 186,
+      "dropped": 324,
+      "skipped": 100,
+      "latency_ms_mean": 88.7,
+      "latency_ms_p95": 190.7
+    },
+    {
+      "sid": 3,
+      "offset_s": 0.75,
+      "processed": 196,
+      "dropped": 314,
+      "skipped": 116,
+      "latency_ms_mean": 91.4,
+      "latency_ms_p95": 219.7
+    }
+  ],
+  "decode_ms_per_frame": 5.64
+}

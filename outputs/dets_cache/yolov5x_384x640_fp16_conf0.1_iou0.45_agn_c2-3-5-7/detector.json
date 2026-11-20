@@ -1,0 +1,16 @@
+{
+  "input_hw": [
+    384,
+    640
+  ],
+  "fp16": true,
+  "conf_thres": 0.1,
+  "iou_thres": 0.45,
+  "classes": [
+    2,
+    3,
+    5,
+    7
+  ],
+  "agnostic_nms": true
+}

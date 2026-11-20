@@ -1,0 +1,146 @@
+{
+  "versions": {
+    "python": "3.10.12",
+    "torch": "2.8.0",
+    "cuda": "12.6",
+    "cudnn": 90300,
+    "numpy": "1.26.4",
+    "opencv": "4.8.0",
+    "scipy": "1.8.0",
+    "ultralytics": "8.4.194",
+    "filterpy": "2.0.0",
+    "lap": "0.5.14",
+    "gpu": "Orin",
+    "gpu_capability": "8.7",
+    "gpu_mem_gb": 30.0,
+    "gpu_count": 1,
+    "auto_fp16": true
+  },
+  "paths": {
+    "code_root": "/home/orin/emo/EmoOcSortJetson",
+    "data_root": "/home/orin/emo/Vehicle_Tracking_MOT",
+    "weights": "/home/orin/emo/engines",
+    "yolov5_dir": "/home/orin/emo/yolov5",
+    "trackeval_dir": "/home/orin/emo/EmoOcSortJetson/third_party/TrackEval",
+    "output_root": "/home/orin/emo/EmoOcSortJetson/outputs"
+  },
+  "checks": {
+    "cuda available": {
+      "ok": true,
+      "detail": ""
+    },
+    "package ultralytics": {
+      "ok": true,
+      "detail": ""
+    },
+    "package filterpy": {
+      "ok": true,
+      "detail": ""
+    },
+    "package lap": {
+      "ok": true,
+      "detail": ""
+    },
+    "path data_root exists": {
+      "ok": true,
+      "detail": "/home/orin/emo/Vehicle_Tracking_MOT"
+    },
+    "path weights exists": {
+      "ok": true,
+      "detail": "/home/orin/emo/engines"
+    },
+    "path yolov5_dir exists": {
+      "ok": true,
+      "detail": "/home/orin/emo/yolov5"
+    },
+    "path trackeval_dir exists": {
+      "ok": true,
+      "detail": "/home/orin/emo/EmoOcSortJetson/third_party/TrackEval"
+    },
+    "sequences.json exists": {
+      "ok": true,
+      "detail": ""
+    },
+    "yolov5 pinned commit": {
+      "ok": true,
+      "detail": "HEAD=af08ba156fd58ed5b0fe7e4e58a22c72c3cdd0ce"
+    },
+    "TrackEval pinned commit": {
+      "ok": true,
+      "detail": "HEAD=12c8791b303e0a0b50f753af204249e622d0281a"
+    },
+    "80 COCO classes": {
+      "ok": true,
+      "detail": "80 classes"
+    },
+    "vehicle class names": {
+      "ok": true,
+      "detail": ""
+    },
+    "VNTraffic frame 1 detections": {
+      "ok": true,
+      "detail": "48 dets (conf>=0.1), 30 with conf>=0.4, {'car': 17, 'motorcycle': 28, 'bus': 1, 'truck': 2}"
+    },
+    "OC-SORT produces tracks": {
+      "ok": true,
+      "detail": "mean 25.3 tracks/frame, 44 unique IDs"
+    },
+    "IDs persist": {
+      "ok": true,
+      "detail": "60% of IDs at frame 10 still present at frame 60"
+    },
+    "TrackEval GT vs GT = 100": {
+      "ok": true,
+      "detail": ""
+    }
+  },
+  "detector": {
+    "weights": "/home/orin/emo/engines",
+    "fp16": true,
+    "input_hw": [
+      384,
+      640
+    ],
+    "classes": [
+      2,
+      3,
+      5,
+      7
+    ],
+    "conf_thres": 0.1,
+    "frame1_dets": 48,
+    "frame1_dets_conf_ge_0_4": 30,
+    "frame1_per_class": {
+      "car": 17,
+      "motorcycle": 28,
+      "bus": 1,
+      "truck": 2
+    }
+  },
+  "ocsort": {
+    "frames": 60,
+    "unique_ids": 44,
+    "mean_tracks_per_frame": 25.3,
+    "ids_at_frame10_still_alive_at_end": 0.6,
+    "file": "/home/orin/emo/EmoOcSortJetson/outputs/env_check/ocsort_first_frames.txt"
+  },
+  "speed": [
+    {
+      "batch": 1,
+      "infer_ms": 8.4,
+      "end2end_ms": 15.9,
+      "img_per_s_end2end": 62.7,
+      "precision": "fp16"
+    },
+    {
+      "batch": 4,
+      "infer_ms": 25.8,
+      "end2end_ms": 52.9,
+      "img_per_s_end2end": 75.7,
+      "precision": "fp16"
+    }
+  ],
+  "speed_gpu_max_mem_mb": 88,
+  "passed": true,
+  "failed_checks": []
+}

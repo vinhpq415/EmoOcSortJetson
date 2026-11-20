@@ -1,0 +1,87 @@
+
+CLEAR Config:
+THRESHOLD            : 0.5                           
+PRINT_CONFIG         : True                          
+
+Identity Config:
+THRESHOLD            : 0.5                           
+PRINT_CONFIG         : True                          
+
+Evaluating 4 tracker(s) on 1 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: HOTA, CLEAR, Identity, Count
+
+
+Evaluating RT_B3_k2_fast_s0
+
+
+HOTA: RT_B3_k2_fast_s0-pedestrian  HOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      OWTA      HOTA(0)   LocA(0)   HOTALocA(0)
+VNTraffic                          64.73     64.425    65.209    69.175    85.082    68.579    88.048    88.581    67.157    74.513    86.397    64.377    
+COMBINED                           64.73     64.425    65.209    69.175    85.082    68.579    88.048    88.581    67.157    74.513    86.397    64.377    
+
+CLEAR: RT_B3_k2_fast_s0-pedestrian MOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
+VNTraffic                          73.228    87.075    73.378    77.341    95.126    44.706    44.706    10.588    63.231    12373     3625      634       24        38        38        9         203       
+COMBINED                           73.228    87.075    73.378    77.341    95.126    44.706    44.706    10.588    63.231    12373     3625      634       24        38        38        9         203       
+
+Identity: RT_B3_k2_fast_s0-pedestrianIDF1      IDR       IDP       IDTP      IDFN      IDFP      
+VNTraffic                          80.29     72.784    89.521    11644     4354      1363      
+COMBINED                           80.29     72.784    89.521    11644     4354      1363      
+
+Count: RT_B3_k2_fast_s0-pedestrian Dets      GT_Dets   IDs       GT_IDs    
+VNTraffic                          13007     15998     100       85        
+COMBINED                           13007     15998     100       85        
+
+Evaluating RT_B3_k2_fast_s1
+
+
+HOTA: RT_B3_k2_fast_s1-pedestrian  HOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      OWTA      HOTA(0)   LocA(0)   HOTALocA(0)
+VNTraffic                          64.865    64.527    65.394    69.177    85.097    68.571    88.391    88.386    67.252    74.84     86.2      64.513    
+COMBINED                           64.865    64.527    65.394    69.177    85.097    68.571    88.391    88.386    67.252    74.84     86.2      64.513    
+
+CLEAR: RT_B3_k2_fast_s1-pedestrian MOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
+VNTraffic                          73.765    86.803    73.89     77.591    95.448    48.235    41.176    10.588    63.526    12413     3585      592       20        41        35        9         192       
+COMBINED                           73.765    86.803    73.89     77.591    95.448    48.235    41.176    10.588    63.526    12413     3585      592       20        41        35        9         192       
+
+Identity: RT_B3_k2_fast_s1-pedestrianIDF1      IDR       IDP       IDTP      IDFN      IDFP      
+VNTraffic                          80.419    72.897    89.673    11662     4336      1343      
+COMBINED                           80.419    72.897    89.673    11662     4336      1343      
+
+Count: RT_B3_k2_fast_s1-pedestrian Dets      GT_Dets   IDs       GT_IDs    
+VNTraffic                          13005     15998     100       85        
+COMBINED                           13005     15998     100       85        
+
+Evaluating RT_B3_k2_fast_s2
+
+
+HOTA: RT_B3_k2_fast_s2-pedestrian  HOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      OWTA      HOTA(0)   LocA(0)   HOTALocA(0)
+VNTraffic                          64.847    64.703    65.173    69.192    85.405    68.332    88.446    88.425    67.146    74.8      86.262    64.524    
+COMBINED                           64.847    64.703    65.173    69.192    85.405    68.332    88.446    88.425    67.146    74.8      86.262    64.524    
+
+CLEAR: RT_B3_k2_fast_s2-pedestrian MOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
+VNTraffic                          74.066    86.842    74.191    77.603    95.787    47.059    41.176    11.765    63.855    12415     3583      546       20        40        35        10        185       
+COMBINED                           74.066    86.842    74.191    77.603    95.787    47.059    41.176    11.765    63.855    12415     3583      546       20        40        35        10        185       
+
+Identity: RT_B3_k2_fast_s2-pedestrianIDF1      IDR       IDP       IDTP      IDFN      IDFP      
+VNTraffic                          80.362    72.734    89.777    11636     4362      1325      
+COMBINED                           80.362    72.734    89.777    11636     4362      1325      
+
+Count: RT_B3_k2_fast_s2-pedestrian Dets      GT_Dets   IDs       GT_IDs    
+VNTraffic                          12961     15998     97        85        
+COMBINED                           12961     15998     97        85        
+
+Evaluating RT_B3_k2_fast_s3
+
+
+HOTA: RT_B3_k2_fast_s3-pedestrian  HOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      OWTA      HOTA(0)   LocA(0)   HOTALocA(0)
+VNTraffic                          64.952    64.502    65.607    69.194    85.072    69.088    87.912    88.43     67.367    74.823    86.248    64.533    
+COMBINED                           64.952    64.502    65.607    69.194    85.072    69.088    87.912    88.43     67.367    74.823    86.248    64.533    
+
+CLEAR: RT_B3_k2_fast_s3-pedestrian MOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
+VNTraffic                          73.722    86.844    73.859    77.597    95.404    49.412    40        10.588    63.513    12414     3584      598       22        42        34        9         181       
+COMBINED                           73.722    86.844    73.859    77.597    95.404    49.412    40        10.588    63.513    12414     3584      598       22        42        34        9         181       
+
+Identity: RT_B3_k2_fast_s3-pedestrianIDF1      IDR       IDP       IDTP      IDFN      IDFP      
+VNTraffic                          80.455    72.947    89.686    11670     4328      1342      
+COMBINED                           80.455    72.947    89.686    11670     4328      1342      
+
+Count: RT_B3_k2_fast_s3-pedestrian Dets      GT_Dets   IDs       GT_IDs    
+VNTraffic                          13012     15998     95        85        
+COMBINED                           13012     15998     95        85        
